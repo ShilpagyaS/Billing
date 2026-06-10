@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
   if (username === USERNAME && password === PASSWORD) {
     const res = NextResponse.json({ success: true });
-    res.cookies.set("rgtl_auth", "authenticated", {
+    res.cookies.set("rgtl_auth", process.env.AUTH_SECRET!, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

@@ -11,7 +11,7 @@ export function middleware(req: NextRequest) {
 
   // Check auth cookie
   const auth = req.cookies.get("rgtl_auth")?.value;
-  if (auth === "authenticated") return NextResponse.next();
+  if (auth === process.env.AUTH_SECRET) return NextResponse.next();
 
   // Redirect to login
   const loginUrl = req.nextUrl.clone();
