@@ -1,9 +1,11 @@
 "use client";
-
+ 
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import QRCode from "qrcode";
 import GemCard from "@/components/GemCard";
 import { GemCertificate } from "@/types/certificate";
-
+ 
 interface DbCert {
   certificate_no: string;
   variety: string;
@@ -17,12 +19,12 @@ interface DbCert {
   gem_image_url?: string;
   created_at?: string;
 }
-
+ 
 interface Props {
   cert: DbCert | null;
   certNo: string;
 }
-
+ 
 function dbToForm(cert: DbCert): GemCertificate {
   return {
     certificateNo: cert.certificate_no,
@@ -37,8 +39,21 @@ function dbToForm(cert: DbCert): GemCertificate {
     gemImageUrl: cert.gem_image_url || "",
   };
 }
-
+ 
 export default function VerifyClient({ cert, certNo }: Props) {
+  const [qrDataUrl, setQrDataUrl] = useState("");
+ 
+  useEffect(() => {
+    if (!cert) return;
+    const url = window.location.href;
+    QRCode.toDataURL(url, {
+      width: 300,
+      margin: 2,
+      color: { dark: "#000000", light: "#ffffff" },
+      errorCorrectionLevel: "L",
+    }).then(setQrDataUrl);
+  }, [cert]);
+ 
   if (!cert) {
     return (
       <div style={{
@@ -65,14 +80,14 @@ export default function VerifyClient({ cert, certNo }: Props) {
       </div>
     );
   }
-
+ 
   const formData = dbToForm(cert);
   const issuedDate = cert.created_at
     ? new Date(cert.created_at).toLocaleDateString("en-IN", {
         day: "numeric", month: "long", year: "numeric",
       })
     : null;
-
+ 
   return (
     <div style={{
       minHeight: "100vh",
@@ -82,15 +97,13 @@ export default function VerifyClient({ cert, certNo }: Props) {
       display: "flex", flexDirection: "column",
       alignItems: "center", gap: "24px",
     }}>
-
-      {/* Header with real logo */}
+ 
+      {/* Header */}
       <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
         <div style={{
           width: "80px", height: "80px", borderRadius: "50%",
-          overflow: "hidden",
-          border: "3px solid #c8a951",
-          boxShadow: "0 0 20px rgba(200,169,81,0.4)",
-          background: "#fff",
+          overflow: "hidden", border: "3px solid #c8a951",
+          boxShadow: "0 0 20px rgba(200,169,81,0.4)", background: "#fff",
         }}>
           <Image src="/rgtl-logo.jpg" alt="RGTL Logo" width={80} height={80}
             style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -104,36 +117,29 @@ export default function VerifyClient({ cert, certNo }: Props) {
           </p>
         </div>
       </div>
-
+ 
       {/* Verified badge */}
       <div style={{
-        background: "rgba(50,180,100,0.12)",
-        border: "1px solid rgba(50,180,100,0.5)",
-        borderRadius: "12px",
-        padding: "14px 28px",
+        background: "rgba(50,180,100,0.12)", border: "1px solid rgba(50,180,100,0.5)",
+        borderRadius: "12px", padding: "14px 28px",
         display: "flex", alignItems: "center", gap: "12px",
       }}>
         <span style={{ fontSize: "28px" }}>✅</span>
         <div>
-          <p style={{ color: "#7ac97a", fontSize: "16px", fontWeight: 800, margin: 0 }}>
-            Certificate Verified
-          </p>
+          <p style={{ color: "#7ac97a", fontSize: "16px", fontWeight: 800, margin: 0 }}>Certificate Verified</p>
           <p style={{ color: "#55aa77", fontSize: "12px", margin: "2px 0 0" }}>
             Tested &amp; certified by Raja Gems Testing Lab
           </p>
         </div>
       </div>
-
-      {/* The Card — no QR on verify page (already scanned) */}
-      <GemCard ref={null} data={formData} qrDataUrl="" />
-
+ 
+      {/* Card — QR generated from current URL */}
+      <GemCard ref={null} data={formData} qrDataUrl={qrDataUrl} />
+ 
       {/* Full data table */}
       <div style={{
-        background: "rgba(255,255,255,0.04)",
-        border: "1px solid rgba(200,169,81,0.2)",
-        borderRadius: "14px",
-        padding: "22px 24px",
-        width: "100%", maxWidth: "400px",
+        background: "rgba(255,255,255,0.04)", border: "1px solid rgba(200,169,81,0.2)",
+        borderRadius: "14px", padding: "22px 24px", width: "100%", maxWidth: "400px",
       }}>
         <h2 style={{
           color: "#e8c97a", fontSize: "12px", fontWeight: 700,
@@ -141,24 +147,22 @@ export default function VerifyClient({ cert, certNo }: Props) {
         }}>
           ✦ Full Certificate Details
         </h2>
-
         {[
           ["Certificate No.", cert.certificate_no],
-          ["Variety", cert.variety],
-          ["Weight", `${cert.weight} CRTs`],
-          ["Color", cert.color],
-          ["Shape & Cut", cert.shape_and_cut],
-          ["Measurement", cert.measurement],
-          ["Specific Gravity", cert.specific_gravity],
-          ["Comment", cert.comment],
-          ["Certified by", cert.gemmologist],
+          ["Variety",         cert.variety],
+          ["Weight",          `${cert.weight} CRTs`],
+          ["Color",           cert.color],
+          ["Shape & Cut",     cert.shape_and_cut],
+          ["Measurement",     cert.measurement],
+          ["Specific Gravity",cert.specific_gravity],
+          ["Comment",         cert.comment],
+          ["Certified by",    cert.gemmologist],
           ...(issuedDate ? [["Issued on", issuedDate]] : []),
         ].map(([label, value]) => (
           <div key={label} style={{
             display: "flex", justifyContent: "space-between",
             alignItems: "flex-start", gap: "12px",
-            padding: "9px 0",
-            borderBottom: "1px solid rgba(255,255,255,0.05)",
+            padding: "9px 0", borderBottom: "1px solid rgba(255,255,255,0.05)",
           }}>
             <span style={{ color: "#8899bb", fontSize: "13px", flexShrink: 0 }}>{label}</span>
             <span style={{ color: "#e8e8f0", fontSize: "13px", fontWeight: 600, textAlign: "right" }}>
@@ -167,11 +171,11 @@ export default function VerifyClient({ cert, certNo }: Props) {
           </div>
         ))}
       </div>
-
-      {/* Footer */}
+ 
       <p style={{ color: "#334455", fontSize: "11px", textAlign: "center", letterSpacing: "0.5px" }}>
         Aashirwad Swarn Market · Nunhai Sarafa Bazar · Jabalpur (M.P.)
       </p>
     </div>
   );
 }
+ 
