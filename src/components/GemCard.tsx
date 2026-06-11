@@ -53,22 +53,29 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
         background: "#fff",
       }}>
         {/* Logo */}
-        <div style={{
-          width: "72px", height: "72px", flexShrink: 0,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
-          <Image
-            src="/rgtl-logo.jpg"
-            alt="RGTL"
-            width={72}
-            height={72}
-            style={{
-              width: "72px", height: "72px",
-              objectFit: "contain",
-              mixBlendMode: "multiply",
-            }}
-          />
-        </div>
+      <div
+  style={{
+    width: "95px",
+    height: "95px",
+    flexShrink: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  }}
+>
+  <Image
+    src="/rgtl-logo.jpg"
+    alt="RGTL"
+    width={105}
+    height={105}
+    style={{
+      width: "105px",
+      height: "105px",
+      objectFit: "contain",
+      mixBlendMode: "multiply",
+    }}
+  />
+</div>
 
         {/* Vertical divider */}
         <div style={{

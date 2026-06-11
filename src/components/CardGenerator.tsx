@@ -232,8 +232,18 @@ export default function CardGenerator() {
               boxShadow: "0 0 16px rgba(200,169,81,0.5)",
               background: "#fff",
             }}>
-            <Image src="/rgtl-logo.jpg" alt="RGTL" width={64} height={64}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            
+<Image
+  src="/rgtl-logo.jpg"
+  alt="RGTL"
+  width={64}
+  height={64}
+  style={{
+    width: "100%",
+    height: "100%",
+    objectFit: "cover"
+  }}
+/>
           </div>
           <div>
             <h1 style={{ fontSize: "28px", fontWeight: 900, color: "#e8c97a", letterSpacing: "1px", lineHeight: 1 }}>
