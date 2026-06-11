@@ -134,7 +134,30 @@ export default function VerifyClient({ cert, certNo }: Props) {
       </div>
  
       {/* Card — QR generated from current URL */}
-      <GemCard ref={null} data={formData} qrDataUrl={qrDataUrl} />
+      {/* Responsive Card */}
+<div
+  style={{
+    width: "100%",
+    overflowX: "auto",
+    display: "flex",
+    justifyContent: "center",
+    padding: "0 10px",
+  }}
+>
+  <div
+    style={{
+      minWidth: "600px",
+      display: "flex",
+      justifyContent: "center",
+    }}
+  >
+    <GemCard
+      ref={null}
+      data={formData}
+      qrDataUrl={qrDataUrl}
+    />
+  </div>
+</div>
  
       {/* Full data table */}
       <div style={{
