@@ -126,36 +126,50 @@ export default function CardGenerator() {
       transform-origin: center center;
     }
 
-    /* On small phone screens, shrink card so it fits viewport */
+    /* On small phone screens, shrink card so it fits viewport for preview */
     @media screen and (max-width: 640px) {
       .card-stage > div {
         transform: scale(0.55);
       }
     }
 
-    /* ===== PRINT — works on mobile & desktop ===== */
+    /* ===== PRINT — EXACT DEBIT CARD SIZE 3.37in × 2.125in ===== */
+    @page {
+      size: 3.37in 2.125in;
+      margin: 0;
+    }
+
     @media print {
-      @page {
-        size: auto;
-        margin: 10mm;
-      }
-      body {
-        background: #fff !important;
+      html, body {
+        width: 3.37in !important;
+        height: 2.125in !important;
+        margin: 0 !important;
         padding: 0 !important;
+        background: #fff !important;
         display: block !important;
-        min-height: auto !important;
+        overflow: hidden !important;
       }
       .card-stage {
-        width: 100% !important;
-        display: flex !important;
-        justify-content: center !important;
-        align-items: flex-start !important;
-        padding-top: 8mm;
+        width: 3.37in !important;
+        height: 2.125in !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: block !important;
+        position: relative !important;
+        overflow: hidden !important;
       }
+      /* 600px card → 3.37in (323.5px @96dpi). scale = 323.5 / 600 = 0.539 */
       .card-stage > div {
-        transform: none !important;
+        transform: scale(0.539) !important;
+        transform-origin: top left !important;
+        width: 600px !important;
+        height: 378px !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        margin: 0 !important;
         box-shadow: none !important;
-        page-break-inside: avoid;
+        border-radius: 0 !important;
       }
       img, * {
         -webkit-print-color-adjust: exact !important;
