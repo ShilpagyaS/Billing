@@ -90,7 +90,7 @@ export default function CardGenerator() {
     if (!cardRef.current) return;
     const cardHtml = cardRef.current.outerHTML;
 
-    const printWindow = window.open("", "_blank", "width=600,height=400");
+    const printWindow = window.open("", "_blank");
     if (!printWindow) {
       alert("Please allow popups for this site to print.");
       return;
@@ -101,66 +101,62 @@ export default function CardGenerator() {
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Raja Gems Certificate — ${form.certificateNo || "Card"}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      background: white;
+      background: #f0f0f0;
       font-family: Arial, sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      padding: 20px;
+      padding: 16px;
     }
 
-    /* Screen preview — show full card normal size */
     .card-stage {
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    /* === PRINT === Force exact debit card size 3.37in × 2.125in === */
-    @page {
-      size: 3.37in 2.125in;
-      margin: 0;
+    .card-stage > div {
+      transform-origin: center center;
     }
 
-    @media print {
-      html, body {
-        width: 3.37in;
-        height: 2.125in;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        background: white;
-      }
-
-      .card-stage {
-        width: 3.37in;
-        height: 2.125in;
-        overflow: hidden;
-        position: relative;
-      }
-
-      /* The card itself: 600 × 378 px → scale to fit 3.37" × 2.125"
-         3.37in = 323.52px at 96dpi → scale = 323.52 / 600 = 0.5392 */
+    /* On small phone screens, shrink card so it fits viewport */
+    @media screen and (max-width: 640px) {
       .card-stage > div {
-        transform: scale(0.5392) !important;
-        transform-origin: top left !important;
-        width: 600px !important;
-        height: 378px !important;
-        margin: 0 !important;
-        box-shadow: none !important;
-        border: none !important;
-        border-radius: 0 !important;
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
+        transform: scale(0.55);
       }
+    }
 
+    /* ===== PRINT — works on mobile & desktop ===== */
+    @media print {
+      @page {
+        size: auto;
+        margin: 10mm;
+      }
+      body {
+        background: #fff !important;
+        padding: 0 !important;
+        display: block !important;
+        min-height: auto !important;
+      }
+      .card-stage {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: center !important;
+        align-items: flex-start !important;
+        padding-top: 8mm;
+      }
+      .card-stage > div {
+        transform: none !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+      }
       img, * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
@@ -177,8 +173,7 @@ export default function CardGenerator() {
     window.onload = function() {
       setTimeout(function() {
         window.print();
-        window.close();
-      }, 400);
+      }, 600);
     };
   <\/script>
 </body>
@@ -232,18 +227,13 @@ export default function CardGenerator() {
               boxShadow: "0 0 16px rgba(200,169,81,0.5)",
               background: "#fff",
             }}>
-            
-<Image
-  src="/rgtl-logo.jpg"
-  alt="RGTL"
-  width={64}
-  height={64}
-  style={{
-    width: "100%",
-    height: "100%",
-    objectFit: "cover"
-  }}
-/>
+            <Image
+              src="/rgtl-logo.jpg"
+              alt="RGTL"
+              width={64}
+              height={64}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
           </div>
           <div>
             <h1 style={{ fontSize: "28px", fontWeight: 900, color: "#e8c97a", letterSpacing: "1px", lineHeight: 1 }}>

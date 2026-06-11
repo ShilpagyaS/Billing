@@ -94,7 +94,7 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
             lineHeight: 1,
             whiteSpace: "nowrap",
           }}>
-            RAJA GEMS STONE TESTING LABS
+            RAJA GEMS TESTING LAB
           </div>
           <div style={{
             fontSize: "11px",
