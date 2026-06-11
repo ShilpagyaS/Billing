@@ -9,157 +9,207 @@ interface GemCardProps {
   qrDataUrl: string;
 }
 
+/**
+ * Debit-card ratio 1.586:1
+ * Rendered: 600 × 378 px
+ */
 const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, ref) => {
-  const rows: [string, string, boolean][] = [
-    ["Certificate No.", data.certificateNo || "", true],
-    ["Variety",         data.variety || "",       false],
-    ["Weight",          data.weight ? `${data.weight} CRTs` : "", false],
-    ["Color",           data.color || "",         false],
-    ["Shape & cut",     data.shapeAndCut || "",   false],
-    ["Measurement",     data.measurement || "",   false],
-    ["Specific Gravity",data.specificGravity || "","" as unknown as boolean],
-    ["Comment",         data.comment || "",       false],
+  const rows: [string, string][] = [
+    ["CERTIFICATE NO.", data.certificateNo || ""],
+    ["VARIETY",         data.variety || ""],
+    ["WEIGHT",          data.weight ? `${data.weight} CRTs` : ""],
+    ["COLOR",           data.color || ""],
+    ["SHAPE & CUT",     data.shapeAndCut || ""],
+    ["MEASUREMENT",     data.measurement || ""],
+    ["SPECIFIC GRAVITY",data.specificGravity || ""],
+    ["COMMENT",         data.comment || ""],
   ];
 
   return (
     <div
       ref={ref}
       style={{
-        width: "370px",
+        width: "600px",
+        height: "378px",
         background: "#ffffff",
-        borderRadius: "10px",
-        border: "1px solid #d0d0d0",
-        fontFamily: "'Arial', sans-serif",
-        boxShadow: "0 2px 16px rgba(0,0,0,0.13)",
+        borderRadius: "12px",
+        border: "1px solid #d4d4d8",
+        fontFamily: "Arial, sans-serif",
+        boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
         overflow: "hidden",
         flexShrink: 0,
+        display: "flex",
+        flexDirection: "column",
       }}
     >
       {/* ── HEADER ── */}
       <div style={{
+        height: "96px",
+        flexShrink: 0,
         display: "flex",
         alignItems: "center",
-        gap: "10px",
-        padding: "10px 14px 8px 12px",
-        borderBottom: "1.5px solid #222",
+        padding: "12px 18px",
+        borderBottom: "1.5px solid #1a237e",
         background: "#fff",
       }}>
         {/* Logo */}
         <div style={{
-          width: "50px", height: "50px", flexShrink: 0,
-          borderRadius: "50%",
-          overflow: "hidden",
-          border: "1.5px solid #c8a951",
+          width: "72px", height: "72px", flexShrink: 0,
+          display: "flex", alignItems: "center", justifyContent: "center",
         }}>
-          <Image src="/rgtl-logo.jpg" alt="RGTL" width={50} height={50}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <Image
+            src="/rgtl-logo.jpg"
+            alt="RGTL"
+            width={72}
+            height={72}
+            style={{
+              width: "72px", height: "72px",
+              objectFit: "contain",
+              mixBlendMode: "multiply",
+            }}
+          />
         </div>
 
-        {/* Title */}
-        <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: "3px", lineHeight: 1 }}>
-            <span style={{ fontSize: "21px", fontWeight: 900, color: "#111", letterSpacing: "0.3px" }}>
-              RAJA GEMS
-            </span>
-            <span style={{ fontSize: "12px", fontWeight: 700, color: "#111", letterSpacing: "1px" }}>
-              TESTING LAB
-            </span>
+        {/* Vertical divider */}
+        <div style={{
+          width: "2px", height: "56px", background: "#d0d0d0",
+          margin: "0 14px", flexShrink: 0,
+        }} />
+
+        {/* Title block — same font size, same weight, one line */}
+        <div style={{ flex: 1, textAlign: "center" }}>
+          <div style={{
+            fontFamily: "Arial Black, Arial, sans-serif",
+            fontSize: "22px",
+            fontWeight: 900,
+            color: "#1a237e",
+            letterSpacing: "1px",
+            lineHeight: 1,
+            whiteSpace: "nowrap",
+          }}>
+            RAJA GEMS STONE TESTING LABS
           </div>
-          <div style={{ fontSize: "6.8px", color: "#666", letterSpacing: "0.5px", marginTop: "3px", textTransform: "uppercase" }}>
-            Aashirwad Swarn Market, Nunhai Sarafa Bazar Jabalpur(M.P.)
+          <div style={{
+            fontSize: "11px",
+            color: "#666",
+            marginTop: "8px",
+            letterSpacing: "0.5px",
+          }}>
+            www.rajagemstones.com
           </div>
         </div>
       </div>
 
       {/* ── BODY ── */}
-      <div style={{ display: "flex", padding: "10px 14px 12px 12px", gap: "8px" }}>
+      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
 
-        {/* Left: data fields */}
-        <div style={{ flex: 1 }}>
-          {rows.map(([key, val]) => (
+        {/* LEFT: data rows */}
+        <div style={{
+          flex: 1,
+          padding: "6px 14px 8px 18px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-around",
+        }}>
+          {rows.map(([key, val], i) => (
             <div key={key} style={{
-              display: "flex",
-              alignItems: "baseline",
+              display: "flex", alignItems: "center",
               padding: "2.5px 0",
-              borderBottom: "0.5px solid #f0f0f0",
+              borderBottom: i < rows.length - 1 ? "1px solid #ececec" : "none",
             }}>
               <span style={{
-                fontSize: "7.8px", color: "#333", fontWeight: 400,
-                minWidth: "90px", flexShrink: 0,
+                fontSize: "10px", fontWeight: 800, color: "#1a1a1a",
+                minWidth: "140px", letterSpacing: "0.6px", flexShrink: 0,
               }}>
                 {key}
               </span>
-              <span style={{ fontSize: "7.8px", color: "#111", fontWeight: 600 }}>
-                {val ? `: ${val}` : ""}
-              </span>
+              <span style={{
+                fontSize: "10px", color: "#444",
+                marginRight: "12px", flexShrink: 0,
+              }}>:</span>
+              <span style={{
+                fontSize: "11.5px", fontWeight: 700, color: "#1a1a1a",
+              }}>{val}</span>
             </div>
           ))}
         </div>
 
-        {/* Right: gem photo + QR + signature */}
+        {/* RIGHT panel */}
         <div style={{
-          width: "86px", flexShrink: 0,
+          width: "160px", flexShrink: 0,
+          borderLeft: "1px solid #e0e0e0",
+          background: "#fafafa",
+          padding: "8px 10px 10px",
           display: "flex", flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: "4px",
+          alignItems: "center", gap: "5px",
         }}>
-          {/* Gem photo */}
+          {/* Gem image */}
           <div style={{
-            width: "74px", height: "66px",
-            background: "#f0f0f0",
+            width: "100%", height: "80px",
+            borderRadius: "6px", background: "#efefef",
             border: "1px solid #ddd",
-            borderRadius: "4px",
-            overflow: "hidden",
             display: "flex", alignItems: "center", justifyContent: "center",
+            overflow: "hidden",
           }}>
             {data.gemImageUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={data.gemImageUrl} alt="Gem"
                 style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             ) : (
-              <span style={{ fontSize: "26px", opacity: 0.35 }}>💎</span>
+              <span style={{ fontSize: "28px", opacity: 0.4 }}>💎</span>
             )}
           </div>
 
-          {/* QR code */}
+          {/* QR Code */}
           <div style={{
-            width: "64px", height: "64px",
-            background: "#fff",
-            border: "1px solid #ccc",
-            borderRadius: "2px",
-            overflow: "hidden",
+            width: "110px", height: "110px",
+            background: "#fff", border: "1px solid #ddd",
+            borderRadius: "4px",
             display: "flex", alignItems: "center", justifyContent: "center",
+            overflow: "hidden", padding: "3px",
           }}>
             {qrDataUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={qrDataUrl} alt="QR" style={{ width: "62px", height: "62px", display: "block" }} />
+              <img src={qrDataUrl} alt="QR"
+                style={{ width: "104px", height: "104px", display: "block" }} />
             ) : (
-              <span style={{ fontSize: "6px", color: "#bbb", textAlign: "center", lineHeight: 1.4 }}>
-                QR<br/>Code
-              </span>
+              <span style={{ fontSize: "10px", color: "#aaa", textAlign: "center" }}>QR Code</span>
             )}
           </div>
 
-          {/* Real Signature image */}
+          {/* Scan to Verify */}
+          <div style={{ fontSize: "9px", color: "#666", letterSpacing: "0.4px" }}>
+            Scan to Verify
+          </div>
+
+          {/* Signature */}
           <div style={{ textAlign: "center", width: "100%" }}>
             <div style={{
-              width: "74px", height: "32px",
-              overflow: "hidden",
+              height: "32px",
               display: "flex", alignItems: "center", justifyContent: "center",
+              marginBottom: "2px",
             }}>
               <Image
                 src="/signature.png"
                 alt="Signature"
-                width={74}
+                width={110}
                 height={32}
-                style={{ width: "74px", height: "32px", objectFit: "contain", objectPosition: "center" }}
+                style={{ height: "32px", width: "auto", objectFit: "contain", maxWidth: "120px" }}
               />
             </div>
-            <div style={{ fontSize: "6.5px", color: "#111", fontWeight: 700, letterSpacing: "0.3px", marginTop: "1px" }}>
+            <div style={{ height: "1px", background: "#bbb", margin: "0 10px 3px" }} />
+            <div style={{
+              fontSize: "10px", fontWeight: 800, color: "#1a1a1a",
+              letterSpacing: "0.4px",
+            }}>
               {data.gemmologist || "AKASH SONI"}
             </div>
-            <div style={{ fontSize: "6px", color: "#555", letterSpacing: "0.4px" }}>GEMMOLOGIST</div>
+            <div style={{
+              fontSize: "8px", color: "#555",
+              letterSpacing: "1.2px", marginTop: "1px",
+            }}>
+              GEMMOLOGIST
+            </div>
           </div>
         </div>
       </div>

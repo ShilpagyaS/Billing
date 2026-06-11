@@ -32,14 +32,12 @@ export default function CardGenerator() {
 
   const handleChange = (key: keyof GemCertificate, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
-    // Reset generated state when form changes
     if (isGenerated) setIsGenerated(false);
   };
 
   const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = (ev) => {
       const url = ev.target?.result as string;
@@ -53,12 +51,10 @@ export default function CardGenerator() {
       setError("Please fill in at least Certificate No., Variety, and Weight.");
       return;
     }
-
     setError("");
     setIsGenerating(true);
 
     try {
-      // Step 1: Save certificate to Supabase
       const saveRes = await fetch("/api/certificates", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -70,18 +66,13 @@ export default function CardGenerator() {
         throw new Error(errData.error || "Failed to save certificate");
       }
 
-      // Step 2: Build verify URL — QR points to your website
       const certNo = form.certificateNo.trim().toUpperCase();
       const verifyUrl = `${window.location.origin}/verify/${encodeURIComponent(certNo)}`;
 
-      // Step 3: Generate QR with the URL (short = scannable)
       const qrUrl = await QRCode.toDataURL(verifyUrl, {
         width: 300,
         margin: 2,
-        color: {
-          dark: "#000000",
-          light: "#ffffff",
-        },
+        color: { dark: "#000000", light: "#ffffff" },
         errorCorrectionLevel: "L",
       });
 
@@ -97,7 +88,6 @@ export default function CardGenerator() {
 
   const handlePrint = () => {
     if (!cardRef.current) return;
-
     const cardHtml = cardRef.current.outerHTML;
 
     const printWindow = window.open("", "_blank", "width=600,height=400");
@@ -114,41 +104,81 @@ export default function CardGenerator() {
   <title>Raja Gems Certificate — ${form.certificateNo || "Card"}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       background: white;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
       font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
       padding: 20px;
-      gap: 12px;
     }
-    .print-label {
-      font-size: 10px;
-      color: #999;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      margin-bottom: 4px;
+
+    /* Screen preview — show full card normal size */
+    .card-stage {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+
+    /* === PRINT === Force exact debit card size 3.37in × 2.125in === */
+    @page {
+      size: 3.37in 2.125in;
+      margin: 0;
+    }
+
     @media print {
-      .print-label { display: none; }
-      body { padding: 0; }
-      /* Force white QR background so dots print correctly */
-      img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      html, body {
+        width: 3.37in;
+        height: 2.125in;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: white;
+      }
+
+      .card-stage {
+        width: 3.37in;
+        height: 2.125in;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* The card itself: 600 × 378 px → scale to fit 3.37" × 2.125"
+         3.37in = 323.52px at 96dpi → scale = 323.52 / 600 = 0.5392 */
+      .card-stage > div {
+        transform: scale(0.5392) !important;
+        transform-origin: top left !important;
+        width: 600px !important;
+        height: 378px !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+      }
+
+      img, * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
     }
   </style>
 </head>
 <body>
-  <p class="print-label">Raja Gems Testing Lab — Gemstone Certificate</p>
-  ${cardHtml}
+  <div class="card-stage">
+    ${cardHtml}
+  </div>
   <script>
     window.onload = function() {
       setTimeout(function() {
         window.print();
         window.close();
-      }, 300);
+      }, 400);
     };
   <\/script>
 </body>
@@ -179,7 +209,6 @@ export default function CardGenerator() {
         padding: "32px 24px 48px",
       }}
     >
-      {/* ── PAGE HEADER ── */}
       <div style={{ textAlign: "center", marginBottom: "40px", position: "relative" }}>
         <button onClick={handleLogout} style={{
           position: "absolute", top: 0, right: 0,
@@ -194,14 +223,7 @@ export default function CardGenerator() {
         >
           Sign Out
         </button>
-        <div
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "14px",
-            marginBottom: "10px",
-          }}
-        >
+        <div style={{ display: "inline-flex", alignItems: "center", gap: "14px", marginBottom: "10px" }}>
           <div style={{
               width: "64px", height: "64px",
               borderRadius: "50%",
@@ -214,55 +236,24 @@ export default function CardGenerator() {
               style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <div>
-            <h1
-              style={{
-                fontSize: "28px",
-                fontWeight: 900,
-                color: "#e8c97a",
-                letterSpacing: "1px",
-                lineHeight: 1,
-              }}
-            >
+            <h1 style={{ fontSize: "28px", fontWeight: 900, color: "#e8c97a", letterSpacing: "1px", lineHeight: 1 }}>
               RAJA GEMS
             </h1>
-            <p
-              style={{
-                color: "#8899bb",
-                fontSize: "11px",
-                letterSpacing: "2px",
-                textTransform: "uppercase",
-                marginTop: "2px",
-              }}
-            >
+            <p style={{ color: "#8899bb", fontSize: "11px", letterSpacing: "2px", textTransform: "uppercase", marginTop: "2px" }}>
               Testing Lab · Certificate Generator
             </p>
           </div>
         </div>
-
-        <p
-          style={{
-            color: "#556",
-            fontSize: "12px",
-            letterSpacing: "0.5px",
-          }}
-        >
+        <p style={{ color: "#556", fontSize: "12px", letterSpacing: "0.5px" }}>
           Aashirwad Swarn Market, Nunhai Sarafa Bazar Jabalpur (M.P.)
         </p>
       </div>
 
-      {/* ── MAIN LAYOUT ── */}
-      <div
-        style={{
-          display: "flex",
-          gap: "40px",
-          maxWidth: "1100px",
-          margin: "0 auto",
-          alignItems: "flex-start",
-          flexWrap: "wrap",
-          justifyContent: "center",
+      <div style={{
+          display: "flex", gap: "40px", maxWidth: "1100px", margin: "0 auto",
+          alignItems: "flex-start", flexWrap: "wrap", justifyContent: "center",
         }}
       >
-        {/* LEFT: FORM */}
         <CertificateForm
           form={form}
           onChange={handleChange}
@@ -271,81 +262,53 @@ export default function CardGenerator() {
           isGenerating={isGenerating}
         />
 
-        {/* RIGHT: CARD PREVIEW */}
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "20px",
-            position: "sticky",
-            top: "32px",
-          }}
-        >
-          <h2
-            style={{
-              color: "#e8c97a",
-              fontSize: "13px",
-              fontWeight: 700,
-              letterSpacing: "1.5px",
-              textTransform: "uppercase",
-              margin: 0,
-            }}
-          >
+        <div style={{
+          display: "flex", flexDirection: "column",
+          alignItems: "center", gap: "20px",
+          position: "sticky", top: "32px",
+        }}>
+          <h2 style={{
+            color: "#e8c97a", fontSize: "13px", fontWeight: 700,
+            letterSpacing: "1.5px", textTransform: "uppercase", margin: 0,
+          }}>
             ✦ Card Preview
           </h2>
 
-          {/* Error message */}
           {error && (
-            <div
-              style={{
-                background: "rgba(220,50,50,0.15)",
-                border: "1px solid rgba(220,50,50,0.4)",
-                borderRadius: "8px",
-                padding: "10px 16px",
-                color: "#ff8888",
-                fontSize: "12px",
-                maxWidth: "340px",
-                textAlign: "center",
-              }}
-            >
+            <div style={{
+              background: "rgba(220,50,50,0.15)",
+              border: "1px solid rgba(220,50,50,0.4)",
+              borderRadius: "8px",
+              padding: "10px 16px",
+              color: "#ff8888",
+              fontSize: "12px",
+              maxWidth: "340px",
+              textAlign: "center",
+            }}>
               {error}
             </div>
           )}
 
-          {/* THE CARD */}
           <GemCard ref={cardRef} data={form} qrDataUrl={qrDataUrl} />
 
-          {/* Status label */}
-          <p
-            style={{
-              color: isGenerated ? "#7ac97a" : "#556",
-              fontSize: "12px",
-              textAlign: "center",
-              maxWidth: "320px",
-              lineHeight: "1.5",
-            }}
-          >
+          <p style={{
+            color: isGenerated ? "#7ac97a" : "#556",
+            fontSize: "12px", textAlign: "center", maxWidth: "320px", lineHeight: "1.5",
+          }}>
             {isGenerated
               ? "✓ Saved to database — scanning QR opens this card on your website"
               : "Fill the form and click Generate to save and preview your certificate"}
           </p>
 
-          {/* Action buttons */}
           {isGenerated && (
             <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
               <button
                 onClick={handlePrint}
                 style={{
                   background: "linear-gradient(135deg, #c8a951, #e8c97a)",
-                  color: "#1a1a2e",
-                  fontWeight: 800,
-                  fontSize: "12px",
-                  letterSpacing: "1px",
-                  padding: "10px 24px",
-                  borderRadius: "8px",
-                  border: "none",
-                  cursor: "pointer",
+                  color: "#1a1a2e", fontWeight: 800, fontSize: "12px",
+                  letterSpacing: "1px", padding: "10px 24px",
+                  borderRadius: "8px", border: "none", cursor: "pointer",
                   textTransform: "uppercase",
                 }}
               >
@@ -356,13 +319,9 @@ export default function CardGenerator() {
                 style={{
                   background: "transparent",
                   border: "1px solid rgba(200,169,81,0.4)",
-                  color: "#e8c97a",
-                  fontWeight: 600,
-                  fontSize: "12px",
-                  letterSpacing: "1px",
-                  padding: "10px 24px",
-                  borderRadius: "8px",
-                  cursor: "pointer",
+                  color: "#e8c97a", fontWeight: 600, fontSize: "12px",
+                  letterSpacing: "1px", padding: "10px 24px",
+                  borderRadius: "8px", cursor: "pointer",
                   textTransform: "uppercase",
                 }}
               >
@@ -371,25 +330,15 @@ export default function CardGenerator() {
             </div>
           )}
 
-          {/* QR explanation */}
           {isGenerated && (
-            <div
-              style={{
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(200,169,81,0.15)",
-                borderRadius: "10px",
-                padding: "14px 18px",
-                maxWidth: "340px",
-              }}
-            >
-              <p
-                style={{
-                  color: "#8899bb",
-                  fontSize: "11px",
-                  lineHeight: "1.6",
-                  margin: 0,
-                }}
-              >
+            <div style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(200,169,81,0.15)",
+              borderRadius: "10px",
+              padding: "14px 18px",
+              maxWidth: "340px",
+            }}>
+              <p style={{ color: "#8899bb", fontSize: "11px", lineHeight: "1.6", margin: 0 }}>
                 <strong style={{ color: "#c8a951" }}>QR Code links to:</strong>
                 <br />
                 <span style={{ color: "#7ac97a", wordBreak: "break-all" }}>
@@ -397,8 +346,7 @@ export default function CardGenerator() {
                     ? `${window.location.origin}/verify/${form.certificateNo.trim().toUpperCase()}`
                     : `/verify/${form.certificateNo}`}
                 </span>
-                <br />
-                <br />
+                <br /><br />
                 Anyone who scans this card is taken directly to your website where the full
                 certificate is displayed and verified from your database.
               </p>
@@ -407,16 +355,10 @@ export default function CardGenerator() {
         </div>
       </div>
 
-      {/* Footer */}
-      <p
-        style={{
-          textAlign: "center",
-          color: "#334",
-          fontSize: "11px",
-          marginTop: "48px",
-          letterSpacing: "0.5px",
-        }}
-      >
+      <p style={{
+        textAlign: "center", color: "#334", fontSize: "11px",
+        marginTop: "48px", letterSpacing: "0.5px",
+      }}>
         Raja Gems Testing Lab · Aashirwad Swarn Market · Nunhai Sarafa Bazar · Jabalpur (M.P.)
       </p>
     </div>
