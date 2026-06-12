@@ -1,7 +1,6 @@
 "use client";
 
 import { forwardRef } from "react";
-import Image from "next/image";
 import { GemCertificate } from "@/types/certificate";
 
 interface GemCardProps {
@@ -38,7 +37,7 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
         boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
       }}
     >
-      {/* HEADER — 110px (bigger to fit bigger logo) */}
+      {/* HEADER — 110px */}
       <div style={{
         height: "110px",
         flexShrink: 0,
@@ -48,25 +47,33 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
         background: "#ffffff",
         borderBottom: "1.5px solid #1a237e",
       }}>
-        {/* Logo — bigger: 100px */}
-        <div style={{ width: "100px", height: "100px", flexShrink: 0 }}>
-          <Image
+
+        {/* Logo + underline only under logo */}
+        <div style={{
+          display: "flex", flexDirection: "column",
+          alignItems: "center", flexShrink: 0,
+          marginRight: "16px",
+        }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/rgtl-logo-new.png"
             alt="RGTL"
-            width={100}
-            height={100}
             style={{
-              width: "100px", height: "100px",
+              width: "100px",
+              height: "96px",
               objectFit: "contain",
               mixBlendMode: "multiply",
+              display: "block",
             }}
           />
+          {/* Underline only under logo */}
+          <div style={{
+            width: "100px", height: "2px",
+            background: "#1a237e", marginTop: "2px",
+          }} />
         </div>
 
-        {/* Vertical divider */}
-        <div style={{ width: "1.5px", height: "72px", background: "#ccc", margin: "0 14px", flexShrink: 0 }} />
-
-        {/* Title — bigger fonts */}
+        {/* Title */}
         <div style={{ flex: 1 }}>
           <div style={{ whiteSpace: "nowrap", lineHeight: 1 }}>
             <span style={{
@@ -82,13 +89,16 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
               TESTING LAB
             </span>
           </div>
-          <div style={{ marginTop: "8px", fontSize: "12px", color: "#666", letterSpacing: "0.5px", textAlign: "center" }}>
+          <div style={{
+            marginTop: "8px", fontSize: "12px", color: "#666",
+            letterSpacing: "0.5px", textAlign: "center",
+          }}>
             www.rajagemstones.com
           </div>
         </div>
       </div>
 
-      {/* BODY — 268px (378-110) */}
+      {/* BODY — 268px */}
       <div style={{ display: "flex", height: "268px" }}>
 
         {/* LEFT — 415px */}
@@ -114,8 +124,7 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
           ))}
         </div>
 
-        {/* RIGHT — 185px
-            Gem:70 + gap:5 + QR:110 + gap:4 + scan:13 + gap:4 + sig:54 = 260 fits in 268 ✓ */}
+        {/* RIGHT — 185px */}
         <div style={{
           width: "185px", flexShrink: 0,
           borderLeft: "1px solid #d0d0d0",
@@ -167,11 +176,10 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
           {/* Signature block */}
           <div style={{ textAlign: "center", width: "163px", flexShrink: 0 }}>
             <div style={{ height: "22px", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "3px" }}>
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src="/signature.png"
                 alt="Signature"
-                width={90}
-                height={22}
                 style={{ height: "22px", width: "auto", maxWidth: "90px", objectFit: "contain" }}
               />
             </div>
