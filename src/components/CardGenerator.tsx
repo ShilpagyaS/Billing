@@ -101,77 +101,41 @@ export default function CardGenerator() {
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Raja Gems Certificate — ${form.certificateNo || "Card"}</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
-      background: #f0f0f0;
-      font-family: Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 16px;
+      background: #2a2a3e;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh; padding: 20px;
     }
-
-    .card-stage {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .card-stage { display: inline-block; }
+    @media screen and (max-width: 620px) {
+      .card-stage { transform: scale(0.54); transform-origin: top center; }
     }
-
-    .card-stage > div {
-      transform-origin: center center;
-    }
-
-    /* On small phone screens, shrink card so it fits viewport for preview */
-    @media screen and (max-width: 640px) {
-      .card-stage > div {
-        transform: scale(0.55);
-      }
-    }
-
-    /* ===== PRINT — EXACT DEBIT CARD SIZE 3.37in × 2.125in ===== */
-    @page {
-      size: 3.37in 2.125in;
-      margin: 0;
-    }
-
+    @page { size: 3.37in 2.125in; margin: 0; }
     @media print {
-      html, body {
-        width: 3.37in !important;
-        height: 2.125in !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        background: #fff !important;
-        display: block !important;
+      html { width: 3.37in; height: 2.125in; }
+      body {
+        width: 3.37in !important; height: 2.125in !important;
+        margin: 0 !important; padding: 0 !important;
+        background: #fff !important; display: block !important;
         overflow: hidden !important;
       }
       .card-stage {
-        width: 3.37in !important;
-        height: 2.125in !important;
-        margin: 0 !important;
-        padding: 0 !important;
         display: block !important;
-        position: relative !important;
-        overflow: hidden !important;
+        width: 3.37in !important; height: 2.125in !important;
+        overflow: hidden !important; position: relative !important;
       }
-      /* 600px card → 3.37in (323.5px @96dpi). scale = 323.5 / 600 = 0.539 */
       .card-stage > div {
-        transform: scale(0.539) !important;
+        transform: scale(0.5392) !important;
         transform-origin: top left !important;
-        width: 600px !important;
-        height: 378px !important;
-        position: absolute !important;
-        top: 0 !important;
-        left: 0 !important;
-        margin: 0 !important;
-        box-shadow: none !important;
-        border-radius: 0 !important;
+        width: 600px !important; height: 378px !important;
+        position: absolute !important; top: 0 !important; left: 0 !important;
+        box-shadow: none !important; border-radius: 0 !important;
       }
-      img, * {
+      * {
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
         color-adjust: exact !important;
@@ -180,20 +144,12 @@ export default function CardGenerator() {
   </style>
 </head>
 <body>
-  <div class="card-stage">
-    ${cardHtml}
-  </div>
+  <div class="card-stage">${cardHtml}</div>
   <script>
-    window.onload = function() {
-      setTimeout(function() {
-        window.print();
-      }, 600);
-    };
+    window.onload = function() { setTimeout(function() { window.print(); }, 700); };
   <\/script>
 </body>
-</html>
-    `);
-
+</html>`);
     printWindow.document.close();
   };
 
@@ -210,14 +166,12 @@ export default function CardGenerator() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%)",
-        fontFamily: "'Segoe UI', Arial, sans-serif",
-        padding: "32px 24px 48px",
-      }}
-    >
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%)",
+      fontFamily: "'Segoe UI', Arial, sans-serif",
+      padding: "32px 24px 48px",
+    }}>
       <div style={{ textAlign: "center", marginBottom: "40px", position: "relative" }}>
         <button onClick={handleLogout} style={{
           position: "absolute", top: 0, right: 0,
@@ -234,20 +188,14 @@ export default function CardGenerator() {
         </button>
         <div style={{ display: "inline-flex", alignItems: "center", gap: "14px", marginBottom: "10px" }}>
           <div style={{
-              width: "64px", height: "64px",
-              borderRadius: "50%",
-              overflow: "hidden",
-              border: "2.5px solid #c8a951",
-              boxShadow: "0 0 16px rgba(200,169,81,0.5)",
-              background: "#fff",
-            }}>
-            <Image
-              src="/rgtl-logo.jpg"
-              alt="RGTL"
-              width={64}
-              height={64}
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            />
+            width: "64px", height: "64px",
+            borderRadius: "50%", overflow: "hidden",
+            border: "2.5px solid #c8a951",
+            boxShadow: "0 0 16px rgba(200,169,81,0.5)",
+            background: "#fff",
+          }}>
+            <Image src="/rgtl-logo.jpg" alt="RGTL" width={64} height={64}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           </div>
           <div>
             <h1 style={{ fontSize: "28px", fontWeight: 900, color: "#e8c97a", letterSpacing: "1px", lineHeight: 1 }}>
@@ -264,10 +212,9 @@ export default function CardGenerator() {
       </div>
 
       <div style={{
-          display: "flex", gap: "40px", maxWidth: "1100px", margin: "0 auto",
-          alignItems: "flex-start", flexWrap: "wrap", justifyContent: "center",
-        }}
-      >
+        display: "flex", gap: "40px", maxWidth: "1100px", margin: "0 auto",
+        alignItems: "flex-start", flexWrap: "wrap", justifyContent: "center",
+      }}>
         <CertificateForm
           form={form}
           onChange={handleChange}
@@ -292,12 +239,9 @@ export default function CardGenerator() {
             <div style={{
               background: "rgba(220,50,50,0.15)",
               border: "1px solid rgba(220,50,50,0.4)",
-              borderRadius: "8px",
-              padding: "10px 16px",
-              color: "#ff8888",
-              fontSize: "12px",
-              maxWidth: "340px",
-              textAlign: "center",
+              borderRadius: "8px", padding: "10px 16px",
+              color: "#ff8888", fontSize: "12px",
+              maxWidth: "340px", textAlign: "center",
             }}>
               {error}
             </div>
@@ -316,29 +260,23 @@ export default function CardGenerator() {
 
           {isGenerated && (
             <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
-              <button
-                onClick={handlePrint}
-                style={{
-                  background: "linear-gradient(135deg, #c8a951, #e8c97a)",
-                  color: "#1a1a2e", fontWeight: 800, fontSize: "12px",
-                  letterSpacing: "1px", padding: "10px 24px",
-                  borderRadius: "8px", border: "none", cursor: "pointer",
-                  textTransform: "uppercase",
-                }}
-              >
+              <button onClick={handlePrint} style={{
+                background: "linear-gradient(135deg, #c8a951, #e8c97a)",
+                color: "#1a1a2e", fontWeight: 800, fontSize: "12px",
+                letterSpacing: "1px", padding: "10px 24px",
+                borderRadius: "8px", border: "none", cursor: "pointer",
+                textTransform: "uppercase",
+              }}>
                 ⎙ Print / Save PDF
               </button>
-              <button
-                onClick={handleReset}
-                style={{
-                  background: "transparent",
-                  border: "1px solid rgba(200,169,81,0.4)",
-                  color: "#e8c97a", fontWeight: 600, fontSize: "12px",
-                  letterSpacing: "1px", padding: "10px 24px",
-                  borderRadius: "8px", cursor: "pointer",
-                  textTransform: "uppercase",
-                }}
-              >
+              <button onClick={handleReset} style={{
+                background: "transparent",
+                border: "1px solid rgba(200,169,81,0.4)",
+                color: "#e8c97a", fontWeight: 600, fontSize: "12px",
+                letterSpacing: "1px", padding: "10px 24px",
+                borderRadius: "8px", cursor: "pointer",
+                textTransform: "uppercase",
+              }}>
                 ↺ Reset
               </button>
             </div>
@@ -348,21 +286,17 @@ export default function CardGenerator() {
             <div style={{
               background: "rgba(255,255,255,0.03)",
               border: "1px solid rgba(200,169,81,0.15)",
-              borderRadius: "10px",
-              padding: "14px 18px",
-              maxWidth: "340px",
+              borderRadius: "10px", padding: "14px 18px", maxWidth: "340px",
             }}>
               <p style={{ color: "#8899bb", fontSize: "11px", lineHeight: "1.6", margin: 0 }}>
-                <strong style={{ color: "#c8a951" }}>QR Code links to:</strong>
-                <br />
+                <strong style={{ color: "#c8a951" }}>QR Code links to:</strong><br />
                 <span style={{ color: "#7ac97a", wordBreak: "break-all" }}>
                   {typeof window !== "undefined"
                     ? `${window.location.origin}/verify/${form.certificateNo.trim().toUpperCase()}`
                     : `/verify/${form.certificateNo}`}
                 </span>
                 <br /><br />
-                Anyone who scans this card is taken directly to your website where the full
-                certificate is displayed and verified from your database.
+                Anyone who scans this card is taken directly to your website where the full certificate is displayed and verified from your database.
               </p>
             </div>
           )}
