@@ -1,0 +1,206 @@
+"use client";
+
+import { forwardRef } from "react";
+import { GemCertificate } from "@/types/certificate";
+
+interface GemCardProps {
+  data: GemCertificate;
+  qrDataUrl: string;
+}
+
+const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, ref) => {
+  const rows: [string, string][] = [
+    ["CERTIFICATE NO.", data.certificateNo || ""],
+    ["VARIETY",         data.variety || ""],
+    ["WEIGHT",          data.weight ? `${data.weight} CRTs` : ""],
+    ["COLOR",           data.color || ""],
+    ["SHAPE & CUT",     data.shapeAndCut || ""],
+    ["MEASUREMENT",     data.measurement || ""],
+    ["SPECIFIC GRAVITY",data.specificGravity || ""],
+    ["COMMENT",         data.comment || ""],
+  ];
+
+  return (
+    <div
+      ref={ref}
+      style={{
+        width: "600px",
+        height: "378px",
+        background: "#ffffff",
+        borderRadius: "12px",
+        fontFamily: "Arial, sans-serif",
+        overflow: "hidden",
+        flexShrink: 0,
+        display: "flex",
+        flexDirection: "column",
+        border: "1px solid #d0d0d0",
+        boxShadow: "0 4px 20px rgba(0,0,0,0.12)",
+      }}
+    >
+      {/* HEADER 110px */}
+      <div style={{
+        width: "600px",
+        height: "110px",
+        flexShrink: 0,
+        background: "#ffffff",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        padding: "0 16px 0 12px",
+      }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          {/* Logo — 90px, bigger to fill white gap */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/rgtl-logo-new.png"
+            alt="RGTL"
+            style={{
+              width: "90px",
+              height: "90px",
+              objectFit: "contain",
+              mixBlendMode: "multiply",
+              flexShrink: 0,
+              marginRight: "14px",
+            }}
+          />
+
+          {/* Title div — line inside so starts from logo right edge */}
+          <div style={{ flex: 1 }}>
+            <div style={{ lineHeight: 1, whiteSpace: "nowrap", marginBottom: "6px" }}>
+              <span style={{
+                fontSize: "36px", fontWeight: 900, color: "#1a1a1a",
+                fontFamily: "Georgia, serif",
+              }}>RAJA GEMS</span>
+              <span style={{
+                fontSize: "20px", fontWeight: 400, color: "#333",
+                marginLeft: "10px", fontFamily: "Georgia, serif", letterSpacing: "1.5px",
+              }}>TESTING LAB</span>
+            </div>
+            <div style={{ height: "1.5px", background: "#1a1a1a", width: "100%" }} />
+            <div style={{
+              fontSize: "11px", color: "#555",
+              letterSpacing: "0.5px", textAlign: "center",
+              marginTop: "5px",
+            }}>
+              www.rajagemstones.com
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* BODY 268px */}
+      <div style={{
+        display: "flex",
+        width: "600px",
+        height: "268px",
+        borderTop: "1px solid #ddd",
+      }}>
+        {/* LEFT 415px */}
+        <div style={{
+          width: "415px",
+          flexShrink: 0,
+          padding: "5px 12px 5px 18px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-around",
+        }}>
+          {rows.map(([key, val], i) => (
+            <div key={key} style={{
+              display: "flex", alignItems: "center",
+              borderBottom: i < rows.length - 1 ? "1px solid #ebebeb" : "none",
+              padding: "3px 0",
+            }}>
+              <span style={{
+                fontSize: "10px", fontWeight: 800, color: "#1a237e",
+                width: "135px", flexShrink: 0, letterSpacing: "0.6px",
+              }}>{key}</span>
+              <span style={{ fontSize: "10px", color: "#555", marginRight: "10px", flexShrink: 0 }}>:</span>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#111" }}>{val}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* RIGHT 185px — padding reduced to fit GEMMOLOGIST */}
+        <div style={{
+          width: "185px",
+          flexShrink: 0,
+          borderLeft: "1px solid #d0d0d0",
+          background: "#f5f5f5",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "5px 11px 5px",  /* reduced from 7 to 5 */
+          overflow: "hidden",
+        }}>
+          {/* Gem image — 65px */}
+          <div style={{
+            width: "161px", height: "65px",
+            borderRadius: "7px", overflow: "hidden",
+            border: "1px solid #ccc", background: "#e8e8e8",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            flexShrink: 0, marginBottom: "5px",
+          }}>
+            {data.gemImageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={data.gemImageUrl} alt="Gem"
+                style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+            ) : (
+              <span style={{ fontSize: "22px", opacity: 0.3 }}>💎</span>
+            )}
+          </div>
+
+          {/* QR 108px */}
+          <div style={{
+            width: "108px", height: "108px",
+            background: "#fff", border: "1px solid #ccc",
+            borderRadius: "5px", overflow: "hidden", padding: "3px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            flexShrink: 0, marginBottom: "4px",
+          }}>
+            {qrDataUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={qrDataUrl} alt="QR"
+                style={{ width: "102px", height: "102px", display: "block" }} />
+            ) : (
+              <span style={{ fontSize: "9px", color: "#aaa", textAlign: "center" }}>QR Code</span>
+            )}
+          </div>
+
+          {/* Scan to Verify */}
+          <div style={{
+            fontSize: "9px", color: "#666",
+            letterSpacing: "0.3px", marginBottom: "4px", flexShrink: 0,
+          }}>
+            Scan to Verify
+          </div>
+
+          {/* Signature block */}
+          <div style={{ textAlign: "center", width: "161px", flexShrink: 0 }}>
+            <div style={{
+              height: "22px", display: "flex",
+              alignItems: "center", justifyContent: "center",
+              marginBottom: "2px",
+            }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/signature.png"
+                alt="Signature"
+                style={{ height: "22px", width: "auto", maxWidth: "88px", objectFit: "contain" }}
+              />
+            </div>
+            <div style={{ height: "1px", background: "#aaa", margin: "0 18px 3px" }} />
+            <div style={{ fontSize: "11px", fontWeight: 800, color: "#111", letterSpacing: "0.5px", lineHeight: 1.2 }}>
+              {data.gemmologist || "AKASH SONI"}
+            </div>
+            <div style={{ fontSize: "9px", color: "#555", letterSpacing: "1.2px", marginTop: "2px", lineHeight: 1 }}>
+              GEMMOLOGIST
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+GemCard.displayName = "GemCard";
+export default GemCard;
