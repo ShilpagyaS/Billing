@@ -59,6 +59,7 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
         border: "5px solid #081238",
         outline: "2px solid #c8a030",
         outlineOffset: "-1px",
+        boxShadow: "0 8px 28px rgba(0,0,0,0.45)",
         boxSizing: "border-box",
       }}
     >
