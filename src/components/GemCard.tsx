@@ -14,10 +14,10 @@ interface GemCardProps {
  * Outline     : 2px solid #c8a030  (outline prints; boxShadow does NOT)
  *
  * RIGHT PANEL layout (170 px wide, space-between):
- *   ┌─────────────────┐  ← gem image box  148 × 112px, blue border, rounded
+ *   ┌─────────────────┐  ← gem image box  128 × 128px, blue border, 4px white padding, rounded
  *   │   gem image     │
  *   └─────────────────┘
- *   ┌─────────────────┐  ← QR code box    148 × 140px, blue border, rounded
+ *   ┌─────────────────┐  ← QR code box    128 × 128px, blue border, 4px white padding, rounded
  *   │    QR code      │
  *   └─────────────────┘
  *      ❯❯ Scan to Verify ❮❮
@@ -266,7 +266,7 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
 
       {/* ══════════════════════════════════════════
           RIGHT PANEL — 170 px
-          Matches Image 3: gem box → QR box → scan text → signature
+          gem box → QR box → scan text → signature
           space-between distributes across full 368px usable height
       ══════════════════════════════════════════ */}
       <div style={{
@@ -281,14 +281,15 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
         boxSizing: "border-box",
       }}>
 
-        {/* ── GEM IMAGE BOX — 148 × 118px (wide landscape, matches Image 1) ── */}
+        {/* ── GEM IMAGE BOX — 128 × 128px (matches QR box exactly: same size, border, 4px white padding) ── */}
         <div style={{
-          width: "148px",
-          height: "118px",
+          width: "128px",
+          height: "128px",
+          background: "#ffffff",
+          border: "2px solid #1a3a8f",
           borderRadius: "10px",
           overflow: "hidden",
-          border: "2px solid #1a3a8f",
-          background: "#f0f3fb",
+          padding: "4px",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -301,9 +302,10 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
               src={data.gemImageUrl}
               alt="Gem"
               style={{
-                width: "100%",
-                height: "100%",
+                width: "96px",
+                height: "96px",
                 objectFit: "cover",
+                borderRadius: "6px",
                 display: "block",
               }}
             />
