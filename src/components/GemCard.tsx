@@ -355,20 +355,6 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
           )}
         </div>
 
-        {/* ── Scan to Verify ── */}
-        <div style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "5px",
-          flexShrink: 0,
-        }}>
-          <span style={{ color: "#b8952a", fontSize: "10px", fontWeight: 900 }}>❯❯</span>
-          <span style={{ fontSize: "10px", fontWeight: 700, color: "#111", letterSpacing: "0.8px" }}>
-            Scan to Verify
-          </span>
-          <span style={{ color: "#b8952a", fontSize: "10px", fontWeight: 900 }}>❮❮</span>
-        </div>
-
         {/* ── Signature block ── */}
         <div style={{
           textAlign: "center",
@@ -419,6 +405,16 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
             {data.gemmologist || "AKASH SONI"}
           </div>
 
+          <div style={{
+            fontSize: "7.5px",
+            fontWeight: 700,
+            color: "#555",
+            letterSpacing: "1.5px",
+            lineHeight: 1.2,
+            marginTop: "1px",
+          }}>
+            GEMMOLOGIST
+          </div>
 
         </div>
 
