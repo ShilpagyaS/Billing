@@ -156,13 +156,6 @@ export default function CardGenerator() {
 
       const cardHtml = clone.outerHTML;
 
-      const pw = window.open("", "_blank");
-      if (!pw) {
-        alert("Please allow popups for this site to enable printing.");
-        setIsPrinting(false);
-        return;
-      }
-
       /*
        * The card div is naturally 600 × 378 px.
        * We place it in a 600 × 378 wrapper and apply transform-origin: top left.
@@ -255,36 +248,44 @@ body {
 </head>
 <body>
 <div class="card-wrap">${cardHtml}</div>
-<script>
-window.onload = function () {
-  var imgs = document.querySelectorAll('img');
-  var total = imgs.length;
-  var loaded = 0;
-  function tryPrint() {
-    loaded++;
-    if (loaded >= total) {
-      setTimeout(function () { window.print(); }, 800);
-    }
-  }
-  if (!total) {
-    setTimeout(function () { window.print(); }, 800);
-    return;
-  }
-  imgs.forEach(function (img) {
-    if (img.complete && img.naturalHeight > 0) {
-      tryPrint();
-    } else {
-      img.onload = tryPrint;
-      img.onerror = tryPrint;
-    }
-  });
-};
-<\/script>
 </body>
 </html>`;
 
-      pw.document.write(printDoc);
-      pw.document.close();
+      // Print via an off-screen iframe using srcdoc — works in Chrome AND Safari,
+      // and never opens a popup so blockers don't trigger.
+      const existing = document.getElementById("rgtl-print-frame");
+      if (existing) existing.remove();
+
+      const iframe = document.createElement("iframe");
+      iframe.id = "rgtl-print-frame";
+      // Off-screen but NOT zero-size / display:none — Safari won't print those.
+      iframe.style.position = "fixed";
+      iframe.style.left = "-10000px";
+      iframe.style.top = "0";
+      iframe.style.width = "400px";
+      iframe.style.height = "300px";
+      iframe.style.border = "0";
+      iframe.setAttribute("aria-hidden", "true");
+
+      let printed = false;
+      const doPrint = () => {
+        if (printed) return;
+        printed = true;
+        const win = iframe.contentWindow;
+        if (!win) return;
+        win.focus();
+        win.print();
+        // Clean up after the dialog closes (afterprint is unreliable in Safari, so also time-fallback).
+        win.addEventListener?.("afterprint", () => setTimeout(() => iframe.remove(), 300));
+        setTimeout(() => { if (document.getElementById("rgtl-print-frame")) iframe.remove(); }, 60000);
+      };
+
+      // Print once the iframe's own document has loaded and rendered.
+      iframe.onload = () => setTimeout(doPrint, 500);
+
+      // srcdoc is more reliable than document.write in Safari.
+      iframe.srcdoc = printDoc;
+      document.body.appendChild(iframe);
 
     } catch (err) {
       console.error("Print failed:", err);
