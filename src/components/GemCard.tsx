@@ -76,15 +76,15 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
         overflow: "hidden",
       }}>
 
-        {/* ── HEADER — 118px ── */}
+        {/* ── HEADER — 128px ── */}
         <div style={{
-          height: "118px",
+          height: "128px",
           flexShrink: 0,
           display: "flex",
           flexDirection: "row",
           alignItems: "center",
           padding: "5px 8px 0 4px",
-          gap: "6px",
+          gap: "0px",
           background: "#ffffff",
           boxSizing: "border-box",
           overflow: "hidden",
@@ -92,36 +92,38 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
 
           {/* Logo */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/rgtl-logo-new.png"
-            alt="RGTL"
-            style={{
-              width: "108px",
-              height: "108px",
-              objectFit: "contain",
-              flexShrink: 0,
-            }}
-          />
+         <img
+  src="/rgtl-logo-new.png"
+  alt="RGTL"
+  style={{
+    width: "120px",
+    height: "120px",
+    objectFit: "contain",
+    flexShrink: 0,
+    marginLeft: "-8px",
+  }}
+/>
 
           {/* Title block */}
           <div style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            gap: "2px",
-            overflow: "hidden",
-          }}>
+  flex: 1,
+  display: "flex",
+  flexDirection: "column",
+  justifyContent: "center",
+  gap: "2px",
+  marginLeft: "-10px",
+  overflow: "hidden",
+}}>
 
             {/* RAJA GEMS */}
             <div style={{
-              fontSize: "40px",
+              fontSize: "48px",
               fontWeight: 900,
               color: "#0f2c8c",
               fontFamily: "Georgia, 'Times New Roman', serif",
               letterSpacing: "2px",
-              lineHeight: "42px",
-              height: "42px",
+              lineHeight: "50px",
+              height: "50px",
               textAlign: "center",
               whiteSpace: "nowrap",
               overflow: "hidden",
@@ -133,19 +135,19 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
             <div style={{
               display: "flex",
               alignItems: "center",
-              gap: "5px",
-              height: "16px",
+              gap: "0px",
+              height: "20px",
               flexShrink: 0,
             }}>
               <div style={{ flex: 1, height: "1.5px", background: "#0f2c8c" }} />
               <span style={{
-                fontSize: "11px",
+                fontSize: "15px",
                 fontWeight: 700,
                 color: "#0f2c8c",
                 fontFamily: "Georgia, 'Times New Roman', serif",
-                letterSpacing: "7px",
+                letterSpacing: "6px",
                 whiteSpace: "nowrap",
-                lineHeight: "16px",
+                lineHeight: "20px",
                 flexShrink: 0,
               }}>
                 TESTING LABS
@@ -157,13 +159,13 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
             <div style={{
               background: "#0f2c8c",
               color: "#ffffff",
-              fontSize: "6.5px",
+              fontSize: "8.5px",
               fontWeight: 800,
               letterSpacing: "1.2px",
               padding: "2px 6px",
               textAlign: "center",
-              lineHeight: "10px",
-              height: "14px",
+              lineHeight: "11px",
+              height: "17px",
               whiteSpace: "nowrap",
               overflow: "hidden",
               flexShrink: 0,
@@ -187,12 +189,12 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
             {/* Website */}
             <div style={{
               textAlign: "center",
-              fontSize: "7.5px",
+              fontSize: "11px",
               color: "#333",
               letterSpacing: "0.3px",
               fontWeight: 500,
-              lineHeight: "10px",
-              height: "10px",
+              lineHeight: "12px",
+              height: "12px",
               flexShrink: 0,
               overflow: "hidden",
             }}>
@@ -223,7 +225,7 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
           {rows.map(([key, val]) => (
             <div key={key} style={{ display: "flex", alignItems: "flex-end" }}>
               <span style={{
-                fontSize: "8.5px",
+                fontSize: "11px",
                 fontWeight: 900,
                 color: "#0d0d0d",
                 width: "132px",
@@ -234,7 +236,7 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
                 {key}
               </span>
               <span style={{
-                fontSize: "8.5px",
+                fontSize: "11px",
                 color: "#111",
                 marginRight: "5px",
                 flexShrink: 0,
@@ -244,7 +246,7 @@ const GemCard = forwardRef<HTMLDivElement, GemCardProps>(({ data, qrDataUrl }, r
                 :
               </span>
               <span style={{
-                fontSize: "8.5px",
+                fontSize: "11px",
                 fontWeight: 600,
                 color: "#1a1a1a",
                 flex: 1,
