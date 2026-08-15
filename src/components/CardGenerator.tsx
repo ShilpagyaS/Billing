@@ -4,6 +4,8 @@ import { useState, useRef, ChangeEvent } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import QRCode from "qrcode";
+import { toPng } from "html-to-image";
+import { jsPDF } from "jspdf";
 import { GemCertificate } from "@/types/certificate";
 import CertificateForm from "./CertificateForm";
 import GemCard from "./GemCard";
@@ -83,213 +85,107 @@ export default function CardGenerator() {
   };
 
   /**
-   * PRINT — No html2canvas.
-   *
-   * 1. Collect every <img> inside the card
-   * 2. Convert /public-path imgs → base64 via canvas (CORS anonymous)
-   *    data: URLs (QR, gem upload) pass through unchanged
-   * 3. Clone card DOM, swap all img.src to data URLs
-   * 4. Serialize to HTML string and open in print popup
-   * 5. @page size = 85.6mm × 53.98mm (CR80 debit card)
-   * 6. CSS transform scales the 600×378 div down to fit the page exactly
-   * 7. print-color-adjust:exact forces ALL colors + backgrounds
-   *
-   * Scale math:
-   *   85.6mm @ 96dpi = 85.6 × 3.7795 = 323.5px
-   *   Scale = 323.5 / 600 = 0.53916...
-   *   Height check: 378 × 0.5392 = 203.8px → 203.8/3.7795 = 53.92mm ✓
+   * Export the currently rendered certificate at exact CR80 card size.
+   * Uses html-to-image because it preserves the browser-rendered CSS layout
+   * more faithfully than html2canvas for this card.
    */
   const handlePrint = async () => {
     if (!cardRef.current || isPrinting) return;
+
     setIsPrinting(true);
 
     try {
-      const cardEl = cardRef.current;
-      const imgs = Array.from(cardEl.querySelectorAll("img")) as HTMLImageElement[];
+      const card = cardRef.current;
 
-      // Convert a URL-based image src → base64 data URL
-      const toDataURL = (img: HTMLImageElement): Promise<string> => {
-        return new Promise((resolve) => {
-          // Already inline data URL — pass through
-          if (img.src.startsWith("data:")) {
-            resolve(img.src);
-            return;
-          }
-          const freshImg = new window.Image();
-          freshImg.crossOrigin = "anonymous";
-          freshImg.onload = () => {
-            const c = document.createElement("canvas");
-            c.width = freshImg.naturalWidth || 300;
-            c.height = freshImg.naturalHeight || 300;
-            const ctx = c.getContext("2d");
-            if (ctx) {
-              ctx.drawImage(freshImg, 0, 0);
-              try {
-                resolve(c.toDataURL("image/png"));
-              } catch {
-                resolve(img.src);
+      // Wait until fonts and images used by the visible card are ready.
+      if (document.fonts?.ready) {
+        await document.fonts.ready;
+      }
+
+      const images = Array.from(card.querySelectorAll("img"));
+      await Promise.all(
+        images.map(
+          (img) =>
+            new Promise<void>((resolve) => {
+              if (img.complete) resolve();
+              else {
+                img.onload = () => resolve();
+                img.onerror = () => resolve();
               }
-            } else {
-              resolve(img.src);
-            }
-          };
-          freshImg.onerror = () => resolve(img.src);
-          // Cache-bust to avoid stale CORS-cached responses
-          const sep = img.src.includes("?") ? "&" : "?";
-          freshImg.src = img.src + sep + "_cb=" + Date.now();
-        });
-      };
+            })
+        )
+      );
 
-      // Resolve all image srcs in parallel
-      const dataUrls = await Promise.all(imgs.map(toDataURL));
-
-      // Deep-clone the card and inline all image data
-      const clone = cardEl.cloneNode(true) as HTMLElement;
-      const cloneImgs = Array.from(clone.querySelectorAll("img")) as HTMLImageElement[];
-      cloneImgs.forEach((img, i) => {
-        img.src = dataUrls[i];
-        img.style.mixBlendMode = "normal"; // remove any blend modes
+      // Capture the exact 600 × 378 card without changing its visible design.
+      const imageData = await toPng(card, {
+        width: 600,
+        height: 378,
+        canvasWidth: 1200,
+        canvasHeight: 756,
+        pixelRatio: 1,
+        backgroundColor: "#ffffff",
+        cacheBust: true,
+        skipFonts: false,
       });
 
-      // Remove box-shadow from card root (not needed — outline handles border glow)
-      (clone as HTMLElement).style.boxShadow = "none";
+      // Exact CR80 card size — no A4 page.
+      const pdf = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: [85.6, 53.98],
+        compress: true,
+      });
 
-      const cardHtml = clone.outerHTML;
+      pdf.addImage(
+        imageData,
+        "PNG",
+        0,
+        0,
+        85.6,
+        53.98,
+        undefined,
+        "FAST"
+      );
 
-      /*
-       * The card div is naturally 600 × 378 px.
-       * We place it in a 600 × 378 wrapper and apply transform-origin: top left.
-       * scale(0.5392) maps it to exactly 323.5 × 203.8 px = 85.6 × 53.9 mm.
-       *
-       * In @media print we set the body/page to exactly those mm dimensions.
-       * overflow:hidden on body clips anything outside.
-       */
-      const printDoc = `<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<style>
-*,*::before,*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-print-color-adjust: exact !important;
-  print-color-adjust: exact !important;
-  color-adjust: exact !important;
-}
+      const certNo =
+        form.certificateNo.trim().toUpperCase() || "CERTIFICATE";
+      const filename = `Raja-Gems-${certNo}.pdf`;
+      const blob = pdf.output("blob");
+      const file = new File([blob], filename, { type: "application/pdf" });
 
-/* ── Screen preview ── */
-body {
-  background: #1a1a2e;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-}
+      // iPhone/iPad: use the native Share sheet so the user can Save to Files.
+      const isIOS =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
-/* Card wrapper — natural size for screen */
-.card-wrap {
-  width: 600px;
-  height: 378px;
-  overflow: hidden;
-  line-height: 0;
-  /* Show the outline on screen too */
-  outline: 2px solid #c8a030;
-  border-radius: 12px;
-}
+      if (
+        isIOS &&
+        navigator.share &&
+        navigator.canShare?.({ files: [file] })
+      ) {
+        await navigator.share({
+          files: [file],
+          title: filename,
+        });
+        return;
+      }
 
-/* ── CR80 debit-card print page ── */
-@page {
-  size: 85.6mm 53.98mm;
-  margin: 0mm;
-}
+      // Android + desktop: normal PDF download.
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
 
-@media print {
-  html, body {
-    width: 85.6mm !important;
-    height: 53.98mm !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: #ffffff !important;
-    display: block !important;
-    overflow: hidden !important;
-  }
-
-  /* Remove screen centering; pin card to top-left */
-  body {
-    min-height: unset !important;
-    align-items: unset !important;
-    justify-content: unset !important;
-  }
-
-  .card-wrap {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 600px !important;
-    height: 378px !important;
-    transform: scale(0.53916) !important;
-    transform-origin: 0 0 !important;
-    overflow: hidden !important;
-    outline: 2px solid #c8a030 !important;
-    border-radius: 12px !important;
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-  }
-
-  /* Force all descendant backgrounds to print */
-  .card-wrap * {
-    -webkit-print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    color-adjust: exact !important;
-  }
-}
-</style>
-</head>
-<body>
-<div class="card-wrap">${cardHtml}</div>
-</body>
-</html>`;
-
-      // Print via an off-screen iframe using srcdoc — works in Chrome AND Safari,
-      // and never opens a popup so blockers don't trigger.
-      const existing = document.getElementById("rgtl-print-frame");
-      if (existing) existing.remove();
-
-      const iframe = document.createElement("iframe");
-      iframe.id = "rgtl-print-frame";
-      // Off-screen but NOT zero-size / display:none — Safari won't print those.
-      iframe.style.position = "fixed";
-      iframe.style.left = "-10000px";
-      iframe.style.top = "0";
-      iframe.style.width = "400px";
-      iframe.style.height = "300px";
-      iframe.style.border = "0";
-      iframe.setAttribute("aria-hidden", "true");
-
-      let printed = false;
-      const doPrint = () => {
-        if (printed) return;
-        printed = true;
-        const win = iframe.contentWindow;
-        if (!win) return;
-        win.focus();
-        win.print();
-        // Clean up after the dialog closes (afterprint is unreliable in Safari, so also time-fallback).
-        win.addEventListener?.("afterprint", () => setTimeout(() => iframe.remove(), 300));
-        setTimeout(() => { if (document.getElementById("rgtl-print-frame")) iframe.remove(); }, 60000);
-      };
-
-      // Print once the iframe's own document has loaded and rendered.
-      iframe.onload = () => setTimeout(doPrint, 500);
-
-      // srcdoc is more reliable than document.write in Safari.
-      iframe.srcdoc = printDoc;
-      document.body.appendChild(iframe);
-
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
     } catch (err) {
-      console.error("Print failed:", err);
-      alert("Print failed. Please try again.");
+      if (err instanceof DOMException && err.name === "AbortError") return;
+
+      console.error("PDF export failed:", err);
+      alert("PDF export failed. Please try again.");
     } finally {
       setIsPrinting(false);
     }
@@ -418,7 +314,7 @@ body {
                   textTransform: "uppercase", minWidth: "170px",
                 }}
               >
-                {isPrinting ? "⏳ Preparing..." : "⎙ Print / Save PDF"}
+                {isPrinting ? "⏳ Creating PDF..." : "⬇ Download PDF"}
               </button>
               <button onClick={handleReset} style={{
                 background: "transparent", border: "1px solid rgba(200,169,81,0.4)",
@@ -439,10 +335,9 @@ body {
               borderRadius: "8px", padding: "10px 14px", maxWidth: "340px",
             }}>
               <p style={{ color: "#c8a951", fontSize: "10.5px", margin: 0, lineHeight: "1.7", textAlign: "center" }}>
-                💡 In print dialog:<br />
-                <strong>More settings → Background graphics ✅</strong><br />
-                <strong>Margins → None</strong><br />
-                <strong>Paper size → 85.6×54mm</strong> (or A4 — card will be small)
+                💡 PDF exports at exact card size:<br />
+                <strong>85.6 × 53.98 mm</strong><br />
+                No A4 page or print settings required.
               </p>
             </div>
           )}
